@@ -822,18 +822,18 @@ main > div > [class*=__container] {
   transform: translateY(-99%);
 }
 .welcome .bodyLine._animation::before, .welcome .bodyLine._animation::after {
-  transition: transform 3s ease-out 5s;
+  transition: transform 3s ease-out 6s;
   transform: translate(0, 0);
 }
 .welcome .bodyLine._animation span {
-  transition: transform 3s ease-out 4s;
+  transition: transform 3s ease-out 5s;
   transform: translate(0, 0);
 }
 .welcome .contentLine::before, .welcome .contentLine::after {
   transform: translateY(-99%);
 }
 .welcome .contentLine._animation::before, .welcome .contentLine._animation::after, .welcome .contentLine._animation span {
-  transition: transform 3s ease-out 4s;
+  transition: transform 3s ease-out 5s;
   transform: translate(0, 0);
 }
 

@@ -212,7 +212,7 @@
                     blocks.forEach(((item, index) => {
                         if (item === document.querySelector(gotoLinkSelector) || item === document.querySelector(gotoLinkSelector).closest(".more")) {
                             currentBlock = item;
-                            activeBlock = index;
+                            activeBlock = index + 1;
                         }
                     }));
                     gotoblock_gotoBlock(currentBlock, noHeader, gotoSpeed, offsetTop);
