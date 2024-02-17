@@ -195,7 +195,12 @@
     let addWindowScrollEvent = false;
     let blocks = document.querySelectorAll("main>div");
     let activeBlock = 0;
-    initScroll();
+    let isScroll = false;
+    let heightGap = 60;
+    let time = 700;
+    setTimeout((() => {
+        initScroll();
+    }), 0);
     function pageNavigation() {
         document.addEventListener("click", pageNavigationAction);
         document.addEventListener("watcherCallback", pageNavigationAction);
@@ -212,9 +217,11 @@
                     blocks.forEach(((item, index) => {
                         if (item === document.querySelector(gotoLinkSelector) || item === document.querySelector(gotoLinkSelector).closest(".more")) {
                             currentBlock = item;
-                            activeBlock = index + 1;
+                            activeBlock = index;
                         }
                     }));
+                    isScroll = true;
+                    setTimeout((() => isScroll = false), time);
                     gotoblock_gotoBlock(currentBlock, noHeader, gotoSpeed, offsetTop);
                     e.preventDefault();
                 }
@@ -242,7 +249,6 @@
         }
     }
     function initScroll() {
-        let isScroll = false;
         let lastScrollTop = scrollY || document.documentElement.scrollTop;
         let needScroll = () => {
             let len = 0;
@@ -254,10 +260,9 @@
             for (let i = 0; i <= activeBlock - 1; i++) len += blocks[i].offsetHeight;
             return len;
         };
-        let heightGap = 60;
-        let time = 700;
         window.scrollTo(0, 0);
         window.addEventListener("scroll", (function handleScroll(e) {
+            if (!blocks.length) return;
             if (isScroll) {
                 e.preventDefault();
                 gotoblock_gotoBlock(blocks[activeBlock]);
@@ -3817,11 +3822,13 @@
     let actualNum = document.querySelector(".navNum-content-slider__actual");
     let allNum = document.querySelector(".navNum-content-slider__all");
     window.addEventListener("load", (function() {
-        try {
-            initAnimation();
-        } catch (e) {
-            console.log(e);
-        }
+        setTimeout((() => {
+            try {
+                initAnimation();
+            } catch (e) {
+                console.log(e);
+            }
+        }), 0);
         setTimeout((function() {
             try {
                 initSlider();
