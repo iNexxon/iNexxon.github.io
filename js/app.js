@@ -4034,6 +4034,12 @@
                     document.querySelector("header.header").classList.add("_animation");
                     document.querySelector("video").pause();
                     document.querySelector("video").play();
+                    document.body.addEventListener("click", (() => {
+                        document.querySelector("video").play();
+                    }));
+                    document.body.addEventListener("touchstart", (() => {
+                        document.querySelector("video").play();
+                    }));
                 }), 2900);
                 setTimeout((function() {
                     try {
