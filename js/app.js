@@ -4139,7 +4139,13 @@
             };
             let observer = new IntersectionObserver((entries => {
                 entries.forEach((entry => {
-                    if (entry.isIntersecting) entry.target.classList.add("_animation");
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("_animation");
+                        console.log(entry.target.classList);
+                        if (entry.target.classList.contains("content-slider__slider")) setTimeout((() => {
+                            entry.target.classList.remove("_animation");
+                        }), 3e3);
+                    }
                 }));
             }), options);
             const elems = document.querySelectorAll("[data-animation]");
