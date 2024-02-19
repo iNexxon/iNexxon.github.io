@@ -1729,7 +1729,7 @@ main > div > [class*=__container] {
     overflow-y: visible;
   }
   .content-slider__slider._animation {
-    animation: 2s ease-in-out 0.7s forwards running sliderInit;
+    animation: 2s ease-in-out 0.7s running sliderInit;
   }
   @keyframes sliderInit {
     0% {
