@@ -656,7 +656,7 @@ main > div > [class*=__container] {
   left: 50%;
   bottom: -6px;
   transform: translate(-50%, 0);
-  background: white;
+  background: #B4835C;
   transition: width 0.6s;
 }
 .menu__link:hover::after, .menu__link._navigator-active::after {
@@ -875,7 +875,7 @@ main > div > [class*=__container] {
   line-height: 1.21;
   letter-spacing: 0.03em;
   margin-bottom: 3.42%;
-  transform: translateX(-99%);
+  transform: translateX(-150%);
 }
 @media (min-width: 123.5em) {
   .content-welcome__title {
@@ -911,7 +911,7 @@ main > div > [class*=__container] {
   color: rgba(255, 255, 255, 0.7);
   max-width: 66%;
   margin-bottom: 9.7%;
-  transform: translateX(-100%);
+  transform: translateX(-150%);
 }
 @media (min-width: 123.5em) {
   .content-welcome__text {
@@ -940,7 +940,7 @@ main > div > [class*=__container] {
   transform: translate(0, 0);
 }
 .content-welcome__btn {
-  transform: translateX(-100%);
+  transform: translateX(-300%);
 }
 @media (min-width: 123.5em) {
   .content-welcome__btn {
@@ -1096,7 +1096,7 @@ main > div > [class*=__container] {
   width: 61.5%;
   height: 100%;
   z-index: -1;
-  transform: translateX(100%);
+  transform: translateX(200%);
 }
 .video-welcome__video {
   position: absolute;
@@ -1291,7 +1291,7 @@ main > div > [class*=__container] {
   margin: 10%;
   text-align: center;
   min-height: 80%;
-  background: rgba(6, 9, 8, 0.87);
+  background: rgba(6, 9, 8, 0.86);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 @media (max-width: 48.0625em) {
@@ -1304,6 +1304,9 @@ main > div > [class*=__container] {
     max-width: 100%;
     margin: 20% 0;
   }
+}
+.content-more__block._sec {
+  background: rgba(6, 9, 8, 0.72);
 }
 .content-more__title {
   margin-bottom: 10.15%;
@@ -1724,6 +1727,20 @@ main > div > [class*=__container] {
 @media (max-width: 61.99875em) {
   .content-slider__slider {
     overflow-y: visible;
+  }
+  .content-slider__slider._animation {
+    animation: 2s ease-in-out 0.7s forwards running sliderInit;
+  }
+  @keyframes sliderInit {
+    0% {
+      left: 0;
+    }
+    50% {
+      left: -70px;
+    }
+    100% {
+      left: 0;
+    }
   }
 }
 

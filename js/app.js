@@ -207,6 +207,26 @@
                 document.documentElement.classList.add(className);
             }));
         }
+        let isMobile = {
+            Android: function() {
+                return navigator.userAgent.match(/Android/i);
+            },
+            BlackBerry: function() {
+                return navigator.userAgent.match(/BlackBerry/i);
+            },
+            iOS: function() {
+                return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+            },
+            Opera: function() {
+                return navigator.userAgent.match(/Opera Mini/i);
+            },
+            Windows: function() {
+                return navigator.userAgent.match(/IEMobile/i);
+            },
+            any: function() {
+                return isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows();
+            }
+        };
         function addLoadedClass() {
             window.addEventListener("load", (function() {
                 setTimeout((function() {
@@ -391,7 +411,7 @@
         let activeBlock = 0;
         let isScroll = false;
         let heightGap = 60;
-        let time = 700;
+        let time = 600;
         setTimeout((() => {
             initScroll();
         }), 0);
@@ -455,14 +475,10 @@
                 return len;
             };
             window.scrollTo(0, 0);
-            window.addEventListener("scroll", (function handleScroll(e) {
+            window.addEventListener("scroll", (e => {
                 if (!blocks.length) return;
                 if (isScroll) {
                     e.preventDefault();
-                    window.scrollTo({
-                        top: blocks[activeBlock].getBoundingClientRect().top + scrollY,
-                        behavior: "smooth"
-                    });
                     return;
                 }
                 const scrollTopPosition = scrollY || document.documentElement.scrollTop;
@@ -4032,6 +4048,8 @@
                     welcome.querySelector(".bodyLine").classList.add("_animation");
                     welcome.querySelector(".contentLine").classList.add("_animation");
                     document.querySelector("header.header").classList.add("_animation");
+                    document.querySelector("video").pause();
+                    document.querySelector("video").play();
                 }), 2900);
                 setTimeout((function() {
                     try {
@@ -4056,15 +4074,17 @@
                     return target[p];
                 },
                 set(target, p, newValue, receiver) {
-                    target[p] = newValue;
-                    slideTo(newValue);
-                    actualNum.textContent = `0${activeSlide.index}`;
+                    if (newValue >= 1 && newValue <= slides.length) {
+                        target[p] = newValue;
+                        slideTo(newValue);
+                        actualNum.textContent = `0${activeSlide.index}`;
+                    }
                     return true;
                 }
             });
             actualNum.textContent = `0${activeSlide.index}`;
             allNum.textContent = `0${slides.length}`;
-            slides.forEach((item => {
+            slides.forEach(((item, index) => {
                 if (document.body.clientWidth > 769) item.style.cssText += `width: ${sliderBody.offsetWidth / 2}px;`; else item.style.cssText += `width: ${sliderBody.offsetWidth}px;`;
                 item.addEventListener("click", (() => {
                     slides.forEach((slide => {
@@ -4075,19 +4095,41 @@
                     }));
                     if (document.body.clientWidth > 769) if (item.classList.contains("_active")) item.style.cssText += `width: ${sliderBody.offsetWidth / 2}px;`; else item.style.cssText += `width: ${sliderBody.offsetWidth}px;`;
                     item.classList.toggle("_active");
+                    activeSlide.index = index + 1;
                 }));
             }));
+            if (isMobile) mobileSwap();
             leftArrow.addEventListener("click", (() => {
-                if (activeSlide.index > 1) activeSlide.index -= 1;
+                activeSlide.index -= 1;
             }));
             rightArrow.addEventListener("click", (() => {
-                if (activeSlide.index < slides.length) activeSlide.index += 1;
+                activeSlide.index += 1;
             }));
             function slideTo(index) {
                 let margin = +window.getComputedStyle(slides[0]).marginRight.replace("px", "") * (index - 1);
                 let left = sliderBody.offsetWidth / 2 * (index - 1) + margin;
                 if (document.body.clientWidth < 770) left = sliderBody.offsetWidth * (index - 1) + margin;
                 sliderContent.style.cssText += `left: -${left}px;`;
+            }
+            function mobileSwap() {
+                sliderContent.addEventListener("touchstart", handleTouchStart);
+                sliderContent.addEventListener("touchend", handleTouchMove);
+                let xDown = null;
+                let yDown = null;
+                function handleTouchStart(evt) {
+                    xDown = evt.touches[0].clientX;
+                    yDown = evt.touches[0].clientY;
+                }
+                function handleTouchMove(evt) {
+                    if (!xDown || !yDown) return;
+                    let xUp = evt.changedTouches[0].clientX;
+                    let yUp = evt.changedTouches[0].clientY;
+                    let xDiff = xDown - xUp;
+                    let yDiff = yDown - yUp;
+                    if (Math.abs(xDiff) > Math.abs(yDiff)) if (xDiff > 0) activeSlide.index += 1; else activeSlide.index -= 1;
+                    xDown = null;
+                    yDown = null;
+                }
             }
         }
         function initAnimation() {
@@ -4101,7 +4143,6 @@
                 }));
             }), options);
             const elems = document.querySelectorAll("[data-animation]");
-            console.log(elems);
             elems.forEach((item => {
                 observer.observe(item);
             }));
