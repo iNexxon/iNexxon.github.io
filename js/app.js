@@ -410,11 +410,7 @@
         let blocks = document.querySelectorAll("main>div");
         let activeBlock = 0;
         let isScroll = false;
-        let heightGap = 60;
         let time = 600;
-        setTimeout((() => {
-            initScroll();
-        }), 0);
         function pageNavigation() {
             document.addEventListener("click", pageNavigationAction);
             document.addEventListener("watcherCallback", pageNavigationAction);
@@ -462,43 +458,31 @@
                 goToHash ? gotoblock_gotoBlock(goToHash, true, 500, 20) : null;
             }
         }
-        function initScroll() {
-            let lastScrollTop = scrollY || document.documentElement.scrollTop;
-            let needScroll = () => {
-                let len = 0;
-                for (let i = 0; i <= activeBlock; i++) len += blocks[i].offsetHeight;
-                return len;
-            };
-            let needScroll1 = () => {
-                let len = 0;
-                for (let i = 0; i <= activeBlock - 1; i++) len += blocks[i].offsetHeight;
-                return len;
-            };
-            window.scrollTo(0, 0);
-            window.addEventListener("scroll", (e => {
-                if (!blocks.length) return;
-                if (isScroll) {
-                    e.preventDefault();
-                    return;
-                }
-                const scrollTopPosition = scrollY || document.documentElement.scrollTop;
-                if (scrollTopPosition < lastScrollTop) {
-                    if (scrollY < needScroll1() - heightGap) {
-                        if (activeBlock - 1 < 0) return;
-                        activeBlock -= 1;
-                        isScroll = true;
-                        setTimeout((() => isScroll = false), time);
-                        gotoblock_gotoBlock(blocks[activeBlock]);
+        function headerScroll() {
+            addWindowScrollEvent = true;
+            const header = document.querySelector("header.header");
+            const headerShow = header.hasAttribute("data-scroll-show");
+            const headerShowTimer = header.dataset.scrollShow ? header.dataset.scrollShow : 500;
+            const startPoint = header.dataset.scroll ? header.dataset.scroll : 1;
+            let scrollDirection = 0;
+            let timer;
+            document.addEventListener("windowScroll", (function(e) {
+                const scrollTop = window.scrollY;
+                clearTimeout(timer);
+                if (scrollTop >= startPoint) {
+                    !header.classList.contains("_header-scroll") ? header.classList.add("_header-scroll") : null;
+                    if (headerShow) {
+                        if (scrollTop > scrollDirection) header.classList.contains("_header-show") ? header.classList.remove("_header-show") : null; else !header.classList.contains("_header-show") ? header.classList.add("_header-show") : null;
+                        timer = setTimeout((() => {
+                            !header.classList.contains("_header-show") ? header.classList.add("_header-show") : null;
+                        }), headerShowTimer);
                     }
-                } else if (scrollTopPosition > lastScrollTop) if (scrollY + document.documentElement.clientHeight > needScroll() + heightGap) {
-                    if (activeBlock + 1 > blocks.length) return;
-                    activeBlock += 1;
-                    isScroll = true;
-                    setTimeout((() => isScroll = false), time);
-                    gotoblock_gotoBlock(blocks[activeBlock]);
+                } else {
+                    header.classList.contains("_header-scroll") ? header.classList.remove("_header-scroll") : null;
+                    if (headerShow) header.classList.contains("_header-show") ? header.classList.remove("_header-show") : null;
                 }
-                lastScrollTop = scrollTopPosition <= 0 ? 0 : scrollTopPosition;
-            }), false);
+                scrollDirection = scrollTop <= 0 ? 0 : scrollTop;
+            }));
         }
         setTimeout((() => {
             if (addWindowScrollEvent) {
@@ -4066,6 +4050,8 @@
             }), 0);
         }));
         function initSlider() {
+            let slideIsActive = false;
+            let widthClick = 20;
             let activeSlide = {
                 index: 1
             };
@@ -4074,9 +4060,9 @@
                     return target[p];
                 },
                 set(target, p, newValue, receiver) {
-                    if (newValue >= 1 && newValue <= slides.length) {
+                    if (newValue >= 1 && newValue <= slides.length && !sliderContent.classList.contains("_animation")) {
                         target[p] = newValue;
-                        slideTo(newValue);
+                        if (document.body.clientWidth > 769 && newValue >= 4) if (slideIsActive && 5 === newValue) slideTo(5); else slideTo(4); else slideTo(newValue);
                         actualNum.textContent = `0${activeSlide.index}`;
                     }
                     return true;
@@ -4084,21 +4070,28 @@
             });
             actualNum.textContent = `0${activeSlide.index}`;
             allNum.textContent = `0${slides.length}`;
+            let xDown = null;
             slides.forEach(((item, index) => {
                 if (document.body.clientWidth > 769) item.style.cssText += `width: ${sliderBody.offsetWidth / 2}px;`; else item.style.cssText += `width: ${sliderBody.offsetWidth}px;`;
-                item.addEventListener("click", (() => {
-                    slides.forEach((slide => {
-                        if (slide !== item) {
-                            if (document.body.clientWidth > 769) if (slide.classList.contains("_active")) slide.style.cssText += `width: ${sliderBody.offsetWidth / 2}px;`;
-                            slide.classList.remove("_active");
-                        }
-                    }));
-                    if (document.body.clientWidth > 769) if (item.classList.contains("_active")) item.style.cssText += `width: ${sliderBody.offsetWidth / 2}px;`; else item.style.cssText += `width: ${sliderBody.offsetWidth}px;`;
-                    item.classList.toggle("_active");
-                    activeSlide.index = index + 1;
+                item.addEventListener("mousedown", (e => {
+                    xDown = e.clientX;
+                }));
+                item.addEventListener("mouseup", (e => {
+                    if (Math.abs(xDown - e.clientX) < widthClick) {
+                        slides.forEach((slide => {
+                            if (slide !== item) {
+                                if (document.body.clientWidth > 769) if (slide.classList.contains("_active")) slide.style.cssText += `width: ${sliderBody.offsetWidth / 2}px;`;
+                                slide.classList.remove("_active");
+                            }
+                        }));
+                        if (document.body.clientWidth > 769) if (item.classList.contains("_active")) item.style.cssText += `width: ${sliderBody.offsetWidth / 2}px;`; else item.style.cssText += `width: ${sliderBody.offsetWidth}px;`;
+                        item.classList.toggle("_active");
+                        slideIsActive = item.classList.contains("_active");
+                        activeSlide.index = index + 1;
+                    }
                 }));
             }));
-            if (isMobile) mobileSwap();
+            if (isMobile.any()) mobileSwap(); else pcSwap();
             leftArrow.addEventListener("click", (() => {
                 activeSlide.index -= 1;
             }));
@@ -4113,7 +4106,7 @@
             }
             function mobileSwap() {
                 sliderContent.addEventListener("touchstart", handleTouchStart);
-                sliderContent.addEventListener("touchend", handleTouchMove);
+                sliderContent.addEventListener("touchmove", handleTouchMove);
                 let xDown = null;
                 let yDown = null;
                 function handleTouchStart(evt) {
@@ -4126,9 +4119,37 @@
                     let yUp = evt.changedTouches[0].clientY;
                     let xDiff = xDown - xUp;
                     let yDiff = yDown - yUp;
-                    if (Math.abs(xDiff) > Math.abs(yDiff)) if (xDiff > 0) activeSlide.index += 1; else activeSlide.index -= 1;
+                    if (Math.abs(xDiff) > Math.abs(yDiff)) if (xDiff > 0) {
+                        activeSlide.index += 1;
+                        evt.preventDefault();
+                    } else {
+                        activeSlide.index -= 1;
+                        evt.preventDefault();
+                    } else if (yDiff > 0) ;
                     xDown = null;
                     yDown = null;
+                }
+            }
+            function pcSwap() {
+                sliderContent.addEventListener("mousedown", handleMouseStart);
+                sliderContent.addEventListener("mouseup", handleMouseUp);
+                let xDown = null;
+                let yDown = null;
+                function handleMouseStart(evt) {
+                    xDown = evt.clientX;
+                    yDown = evt.clientY;
+                    slides.forEach((slide => {
+                        slide.style.cssText += `user-select: none;`;
+                    }));
+                }
+                function handleMouseUp(evt) {
+                    let xUp = evt.clientX;
+                    evt.clientY;
+                    let xDiff = xDown - xUp;
+                    slides.forEach((slide => {
+                        slide.style.cssText += `user-select: auto;`;
+                    }));
+                    if (Math.abs(xDown - evt.clientX) >= widthClick) if (xDiff > 0) activeSlide.index += 1; else if (xDiff < 0) activeSlide.index -= 1;
                 }
             }
         }
@@ -4137,14 +4158,21 @@
                 rootMargin: "0px",
                 threshold: 0
             };
+            let isSliderAnimation = false;
             let observer = new IntersectionObserver((entries => {
                 entries.forEach((entry => {
                     if (entry.isIntersecting) {
+                        if (entry.target.classList.contains("content-slider__slider")) {
+                            if (document.body.clientWidth < 770 && !isSliderAnimation) {
+                                entry.target.classList.add("_animation");
+                                isSliderAnimation = true;
+                                setTimeout((() => {
+                                    entry.target.classList.remove("_animation");
+                                }), 3e3);
+                            }
+                            return;
+                        }
                         entry.target.classList.add("_animation");
-                        console.log(entry.target.classList);
-                        if (entry.target.classList.contains("content-slider__slider")) setTimeout((() => {
-                            entry.target.classList.remove("_animation");
-                        }), 3e3);
                     }
                 }));
             }), options);
@@ -4158,5 +4186,6 @@
         addLoadedClass();
         menuInit();
         pageNavigation();
+        headerScroll();
     })();
 })();
