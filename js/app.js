@@ -4032,6 +4032,7 @@
                     welcome.querySelector(".bodyLine").classList.add("_animation");
                     welcome.querySelector(".contentLine").classList.add("_animation");
                     document.querySelector("header.header").classList.add("_animation");
+                    document.querySelector("video").muted = true;
                     document.querySelector("video").pause();
                     document.querySelector("video").play();
                     document.body.addEventListener("click", (() => {
