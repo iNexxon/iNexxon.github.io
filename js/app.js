@@ -4117,6 +4117,7 @@
                 let xDown = null;
                 let yDown = null;
                 function handleTouchStart(evt) {
+                    sliderContent.classList.remove("_animation");
                     xDown = evt.touches[0].clientX;
                     yDown = evt.touches[0].clientY;
                 }
